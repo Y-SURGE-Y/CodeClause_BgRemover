@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Removal App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Background Removal App</h1>
+
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">Upload and Remove Background</button>
+</form>
+
+<div id="preview" style="display: none;">
+    <h2>Processed Image</h2>
+    <img id="processedImage" alt="Processed Image">
+    <a id="downloadLink" href="#" download>Download</a>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+    // Send the image file to the server for background removal
+            const response = await fetch('/remove-background', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                // Display the processed image and download link
+                const processedImage = document.getElementById('processedImage');
+                processedImage.src = URL.createObjectURL(await response.blob());
+
+                const preview = document.getElementById('preview');
+                preview.style.display = 'block';
+
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = processedImage.src;
+            } else {
+                console.error('Error removing background:', response.statusText);
+                alert('Error removing background. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error removing background:', error);
+            alert('Error removing background. Please try again.');
+        }
+    });
+</script>
+</body>
+</html>
